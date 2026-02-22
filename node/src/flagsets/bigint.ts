@@ -51,4 +51,8 @@ export class BigBitFlagSet implements FlagSet<bigint, bigint> {
     public enumerate(flags: bigint): EnumerateFlags<bigint> {
         return useIterator(flags, BigBitFlagsIterator)
     }
+
+    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
+        return this._dictionary.lookUp(alias)
+    }
 }

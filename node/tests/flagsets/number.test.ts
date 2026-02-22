@@ -1,14 +1,40 @@
-import { BitFlagSet } from '~'
+import { BitFlagSet, createBitFlagSet } from '~'
+import { describe, expect, test } from 'vitest'
 
 describe(BitFlagSet, () => {
     test('none', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect(flags.none()).toEqual(0)
     })
 
+    test('of', () => {
+        const flags = createBitFlagSet([])
+
+        expect(flags.of()).toEqual(0)
+        expect(flags.of(1)).toEqual(1)
+        expect(flags.of(3, 8)).toEqual(11)
+        expect(flags.of(3, 5, 2)).toEqual(7)
+    })
+
+    test('named', () => {
+        const flags = createBitFlagSet([
+            { value: 1, as: 'A' },
+            { value: 2, as: 'B' },
+            { value: 4, as: 'C' },
+            { value: 8, as: 'D' },
+            { compose: ['A', 'B'], as: 'AB' },
+            { compose: ['A', 'C'], as: 'AC' },
+        ])
+
+        expect(flags.named()).toEqual(0)
+        expect(flags.named('A')).toEqual(1)
+        expect(flags.named('AB', 'D')).toEqual(11)
+        expect(flags.named('AB', 'AC', 'B')).toEqual(7)
+    })
+
     test('union', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect(flags.union(0, 0)).toEqual(0)
         expect(flags.union(1, 0)).toEqual(1)
@@ -18,7 +44,7 @@ describe(BitFlagSet, () => {
     })
 
     test('difference', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect(flags.difference(0, 0)).toEqual(0)
         expect(flags.difference(1, 0)).toEqual(1)
@@ -28,7 +54,7 @@ describe(BitFlagSet, () => {
     })
 
     test('intersection', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect(flags.intersection(0, 0)).toEqual(0)
         expect(flags.intersection(1, 0)).toEqual(0)
@@ -39,7 +65,7 @@ describe(BitFlagSet, () => {
     })
 
     test('isSuperset', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect(flags.isSuperset(0, 0)).toBe(true)
         expect(flags.isSuperset(3, 0)).toBe(true)
@@ -50,7 +76,7 @@ describe(BitFlagSet, () => {
     })
 
     test('enumerate', () => {
-        const flags = new BitFlagSet()
+        const flags = createBitFlagSet([])
 
         expect([...flags.enumerate(0)]).toEqual([])
         expect([...flags.enumerate(1)]).toEqual([1])

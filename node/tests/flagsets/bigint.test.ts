@@ -1,4 +1,5 @@
 import { BigBitFlagSet } from '~'
+import { describe, expect, test } from 'vitest'
 
 describe(BigBitFlagSet, () => {
     test('none', () => {

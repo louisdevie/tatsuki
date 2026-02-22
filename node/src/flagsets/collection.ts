@@ -46,4 +46,8 @@ export class CollectionFlagSet<T> implements FlagSet<T, Set<T>> {
     maximum(flags: Set<T>): Set<T> {
         throw new Error('Method not implemented.')
     }
+
+    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
+        return this._dictionary.lookUp(alias)
+    }
 }

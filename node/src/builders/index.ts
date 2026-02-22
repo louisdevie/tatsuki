@@ -1,1 +1,1 @@
-export { FlagSetBuilder } from './root'
+export { BitFlagSetBuilder, createBitFlagSet } from './number'

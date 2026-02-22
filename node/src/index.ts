@@ -1,9 +1,11 @@
-export { FlagSetBuilder } from './builders'
+export { FlagSetBuilder, createBitFlagSet } from './builders'
+export { FlagDefinition, FlagsDictionary } from './definitions'
+export { InvalidBitFlagValueError } from './errors'
 export {
     ArrayFlagSet,
     Base64BitFlagSet,
     BigBitFlagSet,
     BitFlagSet,
     CollectionFlagSet,
+    FlagSet,
 } from './flagsets'
-export { InvalidBitFlagValueError } from './errors'

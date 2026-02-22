@@ -2,7 +2,7 @@ import type { EnumerateFlags } from '.'
 
 export function useIterator<S, F>(
     value: S,
-    IterConstructor: { new (value: S): Iterator<F> }
+    IterConstructor: { new (value: S): Iterator<F> },
 ): EnumerateFlags<F> {
     const enumerate = {
         _value: value,

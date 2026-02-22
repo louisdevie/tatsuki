@@ -127,4 +127,8 @@ export class Base64BitFlagSet implements FlagSet<number, string> {
     minimum(flags: string): string {
         throw new Error('not implemented')
     }
+
+    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
+        return this._dictionary.lookUp(alias)
+    }
 }

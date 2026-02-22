@@ -1,4 +1,5 @@
 import { Base64BitFlagSet } from '~'
+import { describe, expect, test } from 'vitest'
 
 describe(Base64BitFlagSet, () => {
     test('none', () => {

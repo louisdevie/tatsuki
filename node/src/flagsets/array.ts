@@ -61,4 +61,8 @@ export class ArrayFlagSet<T> implements FlagSet<T, T[]> {
     minimum(flags: T[]): T[] {
         throw new Error('Method not implemented.')
     }
+
+    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
+        return this._dictionary.lookUp(alias)
+    }
 }

@@ -1,4 +1,5 @@
 import { EnumerateFlags } from '../enumeration'
+import { FlagDefinition } from '../definitions'
 
 /**
  * Represents a group of flags of type `F` and the relationships between
@@ -12,6 +13,16 @@ export interface FlagSet<F, S> {
      * Creates an empty set of flags.
      */
     none(): S
+
+    /**
+     * Creates a set of flags from a list of values.
+     */
+    of(...values: F[]): S
+
+    /**
+     * Creates a set of flags from a list of aliases.
+     */
+    named(...aliases: string[]): S
 
     /**
      * Computes the union of two sets of flags.
@@ -55,6 +66,30 @@ export interface FlagSet<F, S> {
     isSuperset(first: S, second: S): boolean
 
     /**
+     * Checks whether the first set of flags includes at least one of the flags
+     * from the second set.
+     *
+     * A flag is considered to be part of the set only if all of its parents are
+     * present too.
+     *
+     * @param flags - A set of flags.
+     * @param required - The flags to search for in the first set.
+     */
+    hasAny(flags: S, required: S): boolean
+
+    /**
+     * Checks whether the first set of flags includes all the flags from the
+     * second set.
+     *
+     * A flag is considered to be part of the set only if all of its parents are
+     * present too.
+     *
+     * @param flags - A set of flags.
+     * @param required - The flags to search for in the first set.
+     */
+    hasAll(flags: S, required: S): boolean
+
+    /**
      * Returns an iterable over the individual flags in a set.
      *
      * @param flags - A set of flags.
@@ -86,6 +121,14 @@ export interface FlagSet<F, S> {
      * @see minimum
      */
     maximum(flags: S): S
+
+    /**
+     * Retrieve a flag definition from its alias.
+     * @param alias The alias of the flag.
+     * @returns The corresponding definition, or `undefined` if there is no flag
+     *          with this alias.
+     */
+    getFlag(alias: string): FlagDefinition<F, S> | undefined
 }
 
 export { ArrayFlagSet } from './array'

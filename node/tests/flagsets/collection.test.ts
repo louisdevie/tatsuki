@@ -1,4 +1,5 @@
 import { CollectionFlagSet } from '~'
+import { describe, expect, test } from 'vitest'
 
 function set<T>(...values: T[]): Set<T> {
     return new Set<T>(values)
@@ -19,7 +20,7 @@ describe(CollectionFlagSet, () => {
         expect(flags.union(set(), set('B'))).toEqual(set('B'))
         expect(flags.union(set('A'), set('B'))).toEqual(set('A', 'B'))
         expect(flags.union(set('A', 'B'), set('B', 'C'))).toEqual(
-            set('A', 'B', 'C')
+            set('A', 'B', 'C'),
         )
     })
 
@@ -41,10 +42,10 @@ describe(CollectionFlagSet, () => {
         expect(flags.intersection(set('A'), set('B'))).toEqual(set())
         expect(flags.intersection(set('A'), set('A', 'B'))).toEqual(set('A'))
         expect(flags.intersection(set('A', 'B', 'D'), set('A', 'C'))).toEqual(
-            set('A')
+            set('A'),
         )
         expect(
-            flags.intersection(set('A', 'B', 'D'), set('A', 'B', 'C'))
+            flags.intersection(set('A', 'B', 'D'), set('A', 'B', 'C')),
         ).toEqual(set('A', 'B'))
     })
 

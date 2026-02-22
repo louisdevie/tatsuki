@@ -9,10 +9,6 @@ export class BigBitFlagsIterator implements Iterator<bigint> {
         this._current = ENV_BI.ONE
     }
 
-    public [Symbol.iterator](): IterableIterator<bigint> {
-        return this
-    }
-
     public next(): IteratorResult<bigint, undefined> {
         if (this._value == ENV_BI.ZERO) {
             return { done: true, value: undefined }

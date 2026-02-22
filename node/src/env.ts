@@ -1,7 +1,7 @@
 export const ENV_BI = Object.freeze(
     typeof BigInt === 'function'
         ? { AVAILABLE: true, ZERO: BigInt(0), ONE: BigInt(1) }
-        : { AVAILABLE: false }
+        : { AVAILABLE: false },
 ) as {
     readonly AVAILABLE: boolean
     readonly ZERO: bigint
@@ -20,7 +20,7 @@ export const ENV_SET = Object.freeze(
               difference: polyfillDifference(Set.prototype),
               isSupersetOf: polyfillIsSupersetOf(Set.prototype),
           }
-        : { AVAILABLE: false }
+        : { AVAILABLE: false },
 ) as {
     readonly AVAILABLE: boolean
     readonly union: SetBinaryOperation
