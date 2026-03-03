@@ -1,4 +1,5 @@
 import { FlagDefinition, printFlagValue } from './definitions'
+import pkg from '../package.json'
 
 /**
  * Error thrown when a feature is not available in the current environment.
@@ -38,10 +39,7 @@ export class ReusedFlagAliasError extends Error {
  */
 export class ReusedFlagValueError extends Error {
     /** @internal */
-    public constructor(
-        a: FlagDefinition<unknown, unknown>,
-        b: FlagDefinition<unknown, unknown>,
-    ) {
+    public constructor(a: FlagDefinition<unknown, unknown>, b: FlagDefinition<unknown, unknown>) {
         super(
             `The value ${printFlagValue(a)} is already being used ${b.alias ? 'for the flag "' + b.alias + '"' : 'by another flag'}.`,
         )
@@ -54,18 +52,33 @@ export class ReusedFlagValueError extends Error {
 export class InvalidOperationError extends Error {
     /** @internal */
     public constructor(methodName: string, explanation?: string) {
-        super(
-            `.${methodName}() is not allowed here${explanation ? ': ' + explanation : ''}.`,
-        )
+        super(`.${methodName}() is not allowed here${explanation ? ': ' + explanation : ''}.`)
     }
 }
 
 /**
- * Error thrown by builders when referencing a flag that is not defined.
+ * Error thrown by builders when a flag references a flag that is not defined.
  */
-export class InvalidReferenceError extends Error {
+export class UndefinedReferenceError extends Error {
     /** @internal */
     public constructor(alias: string, requiredBy: string) {
         super(`Undefined flag "${alias}" required by ${requiredBy}.`)
+    }
+}
+
+/**
+ * Error thrown by builders when a circular dependency is created.
+ */
+export class CircularReferenceError extends Error {
+    /** @internal */
+    public constructor(chain: string[]) {
+        super(`Circular reference found: ${chain.join(' → ')}.`)
+    }
+}
+
+export class InternalError extends Error {
+    /** @internal */
+    public constructor(message: string) {
+        super(`[Tatsuki internal error] ${message}. Please report it at ${pkg.bugs.url}.`)
     }
 }

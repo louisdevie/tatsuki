@@ -1,11 +1,7 @@
 import type { FlagSet } from '.'
 import { UnavailableFeatureError } from '../errors'
 import { ENV_BI } from '../env'
-import {
-    BigBitFlagsIterator,
-    EnumerateFlags,
-    useIterator,
-} from '../enumeration'
+import { BigBitFlagsIterator, EnumerateFlags, useIterator } from '../enumeration'
 
 export class BigBitFlagSet implements FlagSet<bigint, bigint> {
     /**

@@ -67,7 +67,7 @@ export interface FlagSet<F, S> {
 
     /**
      * Checks whether the first set of flags includes at least one of the flags
-     * from the second set.
+     * from the second set. If there is no required flags, the result will always be `false`.
      *
      * A flag is considered to be part of the set only if all of its parents are
      * present too.
@@ -79,7 +79,7 @@ export interface FlagSet<F, S> {
 
     /**
      * Checks whether the first set of flags includes all the flags from the
-     * second set.
+     * second set. If there is no required flags, the result will always be `true`.
      *
      * A flag is considered to be part of the set only if all of its parents are
      * present too.

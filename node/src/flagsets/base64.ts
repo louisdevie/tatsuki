@@ -1,15 +1,6 @@
 import type { FlagSet } from '.'
-import {
-    decodeB64Byte,
-    encodeB64Byte,
-    normaliseB64String,
-    ZERO_STRING,
-} from '../base64'
-import {
-    Base64BitflagIterator,
-    EnumerateFlags,
-    useIterator,
-} from '../enumeration'
+import { decodeB64Byte, encodeB64Byte, normaliseB64String, ZERO_STRING } from '../base64'
+import { Base64BitflagIterator, EnumerateFlags, useIterator } from '../enumeration'
 
 /**
  * Provides flags that are stored in strings using a little-endian base 64

@@ -1,4 +1,3 @@
-import { BitFlagSet, FlagDefinition, FlagsDictionary } from '~'
 import {
     DefineWithValueOrOrdinal,
     RequireParentsOrDefineWithValueOrOrdinal,
@@ -6,23 +5,24 @@ import {
     WithValueOrOrdinalOrCompose,
 } from './syntax'
 import {
-    applyDeclarationsWithValueOrOrdinal,
+    applyDeclarations,
     FlagWithValueOrOrdinal,
     ListOfFlagsWithValueOrOrdinal,
     NamedFlagWithValueOrOrdinal,
 } from './declarative'
-import { BitFlagDefinition } from '../definitions'
-import { FlagDefinitionFactory, GenericFlagSetBuilder, PartialDefinition } from './generic'
+import { BitFlagDefinitionFactory, FlagDefinition } from '~/definitions'
+import { FlagSetBuilder } from './generic'
+import { BitFlagSet } from '~/flagsets'
 
 export class BitFlagSetBuilder
     implements
         WithValueOrOrdinalOrCompose<number, number, BitFlagSet>,
         RequireParentsOrDefineWithValueOrOrdinal<number, number, BitFlagSet>
 {
-    private readonly _underlying: GenericFlagSetBuilder<number, number>
+    private readonly _underlying: FlagSetBuilder<number>
 
     public constructor() {
-        this._underlying = new GenericFlagSetBuilder(new BitFlagDefinitionFactory())
+        this._underlying = new FlagSetBuilder()
     }
 
     public define(): WithValueOrOrdinal<number, number, BitFlagSet>
@@ -55,60 +55,11 @@ export class BitFlagSetBuilder
         return this
     }
 
-    public getDictionary(): FlagsDictionary<number, number> {
-        return this._underlying.buildDictionary() as any
-    }
-
     public getResult(): BitFlagSet {
-        return new BitFlagSet(this.getDictionary())
-    }
-}
-
-class BitFlagDefinitionFactory implements FlagDefinitionFactory<number, number> {
-    public readonly supportsDefinitionsByOrdinal = true
-    public readonly supportsDefinitionsByValue = true
-
-    public precomputeTopDown(partialDefinition: PartialDefinition<number, number>): void {
-        partialDefinition.additiveValues = 0
-        partialDefinition.baseValues = 0
-        if (partialDefinition.value !== undefined) {
-            partialDefinition.additiveValues = partialDefinition.value
-            partialDefinition.baseValues = partialDefinition.value
-        }
-        if (partialDefinition.parents !== undefined) {
-            for (const parent of partialDefinition.parents.values()) {
-                partialDefinition.additiveValues =
-                    partialDefinition.additiveValues | (parent.additiveValues ?? 0)
-                if (partialDefinition.value === undefined) {
-                    partialDefinition.baseValues =
-                        partialDefinition.baseValues | (parent.baseValues ?? 0)
-                }
-            }
-        }
-    }
-
-    public precomputeBottomUp(partialDefinition: PartialDefinition<number, number>): void {
-        partialDefinition.subtractiveValues = 0
-        if (partialDefinition.value) {
-            partialDefinition.subtractiveValues = partialDefinition.value
-        }
-        if (partialDefinition.children) {
-            for (const child of partialDefinition.children.values()) {
-                partialDefinition.subtractiveValues =
-                    partialDefinition.subtractiveValues | (child.subtractiveValues ?? 0)
-            }
-        }
-    }
-
-    public createFlagDefinition(
-        partialDefinition: PartialDefinition<number, number>,
-    ): FlagDefinition<number, number> {
-        return new BitFlagDefinition(
-            partialDefinition.baseValues ?? 0,
-            partialDefinition.additiveValues ?? 0,
-            partialDefinition.subtractiveValues ?? 0,
-            partialDefinition.alias,
-        )
+        const graph = this._underlying.finish()
+        const definitions = graph.sortedDefinitions()
+        const factory = new BitFlagDefinitionFactory()
+        return new BitFlagSet(graph.intoDictionary(factory))
     }
 }
 
@@ -118,6 +69,6 @@ export function createBitFlagSet<D extends string>(
 ): BitFlagSet & Record<D, FlagDefinition<number, number>>
 export function createBitFlagSet(declarations: ListOfFlagsWithValueOrOrdinal<number>): BitFlagSet {
     const builder = new BitFlagSetBuilder()
-    applyDeclarationsWithValueOrOrdinal(declarations, builder)
+    applyDeclarations(declarations, builder)
     return builder.getResult()
 }

@@ -1,47 +1,47 @@
 {
-  "name": "multiflag",
-  "version": "2.0.0",
-  "description": "flag/bitflag helper",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsup",
-    "postbuild": "cp package.json README.md ../LICENSE dist",
-    "test": "vitest --ui",
-    "coverage": "vitest run --coverage",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write src/ tests/"
-  },
-  "tsup": {
-    "entry": [
-      "src/index.ts"
+    "name": "multiflag",
+    "version": "2.0.0",
+    "description": "flag/bitflag helper",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/louisdevie/multiflag.git"
+    },
+    "keywords": [
+        "flag",
+        "bitflag"
     ],
-    "splitting": false,
-    "dts": true,
-    "minify": true,
-    "sourcemap": true,
-    "clean": true
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/louisdevie/multiflag.git"
-  },
-  "keywords": [
-    "flag",
-    "bitflag"
-  ],
-  "author": "Louis DEVIE",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/louisdevie/multiflag/issues"
-  },
-  "homepage": "https://github.com/louisdevie/multiflag#readme",
-  "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^4.0.18",
-    "prettier": "^3.8.1",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
-  }
+    "author": "Louis DEVIE",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/louisdevie/tatsuki/issues"
+    },
+    "homepage": "https://github.com/louisdevie/multiflag#readme",
+    "scripts": {
+        "build": "tsup",
+        "postbuild": "cp package.json README.md ../LICENSE dist",
+        "test": "vitest --ui",
+        "coverage": "vitest run --coverage",
+        "type-check": "tsc --noEmit",
+        "format": "prettier --write src/ tests/"
+    },
+    "tsup": {
+        "entry": [
+            "src/index.ts"
+        ],
+        "splitting": false,
+        "dts": true,
+        "minify": true,
+        "sourcemap": true,
+        "clean": true
+    },
+    "devDependencies": {
+        "@vitest/coverage-v8": "^4.0.18",
+        "@vitest/ui": "^4.0.18",
+        "prettier": "^3.8.1",
+        "ts-node": "^10.9.2",
+        "tsup": "^8.5.1",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
+    }
 }

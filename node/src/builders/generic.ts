@@ -1,94 +1,43 @@
-import { InvalidOperationError, InvalidReferenceError } from '../errors'
-import { FlagDefinition, FlagsDictionary } from '~'
-import { printFlagValue } from '../definitions'
-import { GenericFlagsDictionary } from '../definitions/dictionary'
+import { InvalidOperationError } from '~/errors'
+import { FlagsGraph, PartialFlagDefinition, PartialFlagInit, refByAlias } from '~/definitions'
 
-export interface FlagDefinitionFactory<F, S> {
-    readonly supportsDefinitionsByValue: boolean
-    readonly supportsDefinitionsByOrdinal: boolean
+export class FlagSetBuilder<F> {
+    private readonly _graph: FlagsGraph<F>
+    private _currentDefinition: PartialFlagInit<F> | undefined
 
-    precomputeTopDown(partialDefinition: PartialDefinition<F, S>): void
-
-    precomputeBottomUp(partialDefinition: PartialDefinition<F, S>): void
-
-    createFlagDefinition(partialDefinition: PartialDefinition<F, S>): FlagDefinition<F, S>
-}
-
-export interface PartialDefinition<F, S> {
-    alias?: string
-    value?: F
-    parentRefs?: Set<string>
-    parents?: Set<PartialDefinition<F, S>>
-    children?: Set<PartialDefinition<F, S>>
-    baseValues?: S
-    additiveValues?: S
-    subtractiveValues?: S
-}
-
-function addRelationship<F, S>(
-    parent: PartialDefinition<F, S>,
-    child: PartialDefinition<F, S>,
-): void {
-    if (parent.children === undefined) {
-        parent.children = new Set([child])
-    } else {
-        parent.children.add(child)
-    }
-    if (child.parents === undefined) {
-        child.parents = new Set([parent])
-    } else {
-        child.parents.add(parent)
-    }
-}
-
-export class GenericFlagSetBuilder<F, S> {
-    private readonly _factory: FlagDefinitionFactory<F, S>
-    private readonly _definitions: Set<PartialDefinition<F, S>>
-    private _currentDefinition: PartialDefinition<F, S> | undefined
-
-    public constructor(factory: FlagDefinitionFactory<F, S>) {
-        this._factory = factory
-        this._definitions = new Set()
+    public constructor() {
+        this._graph = new FlagsGraph()
         this._currentDefinition = undefined
     }
 
-    private get canMoveOnToNextDefinition(): boolean {
-        return (
-            this._currentDefinition === undefined ||
-            this._currentDefinition.value !== undefined ||
-            this._currentDefinition.parentRefs !== undefined
-        )
-    }
-
-    private createNewDefinition(alias: string | undefined): void {
-        const def = { alias }
-        this._definitions.add(def)
-        this._currentDefinition = def
-    }
-
     public define(alias: string | undefined): void {
-        if (!this.canMoveOnToNextDefinition) {
+        if (
+            this._currentDefinition !== undefined &&
+            this._currentDefinition.value === undefined &&
+            this._currentDefinition.parents === undefined
+        ) {
             throw new InvalidOperationError('define')
         }
-        this.createNewDefinition(alias)
+        this.finishCurrentDefinition()
+        this._currentDefinition = { alias }
     }
 
     public compose(flags: string[]): void {
         if (
             this._currentDefinition === undefined ||
             this._currentDefinition.alias === undefined ||
-            this._currentDefinition.parentRefs !== undefined
+            this._currentDefinition.parents !== undefined
         ) {
             throw new InvalidOperationError('compose')
         }
-        this._currentDefinition.parentRefs = new Set(flags)
+        this._currentDefinition.parents = refByAlias([...new Set(flags)])
     }
 
     public withValue(value: F): void {
         if (
             this._currentDefinition === undefined ||
             this._currentDefinition.value !== undefined ||
-            this._currentDefinition.parentRefs !== undefined
+            this._currentDefinition.parents !== undefined
         ) {
             throw new InvalidOperationError('withValue')
         }
@@ -99,14 +48,25 @@ export class GenericFlagSetBuilder<F, S> {
         if (
             this._currentDefinition === undefined ||
             this._currentDefinition.value === undefined ||
-            this._currentDefinition.parentRefs !== undefined
+            this._currentDefinition.parents !== undefined
         ) {
             throw new InvalidOperationError('requires')
         }
-        this._currentDefinition.parentRefs = new Set(flags)
+        this._currentDefinition.parents = refByAlias([...new Set(flags)])
     }
 
-    public buildDictionary(): FlagsDictionary<F, S> {
+    private finishCurrentDefinition() {
+        if (this._currentDefinition !== undefined) {
+            this._graph.put(this._currentDefinition)
+        }
+        this._currentDefinition = undefined
+    }
+
+    public finish(): FlagsGraph<F> {
+        this.finishCurrentDefinition()
+        return this._graph
+    }
+    /*
         // this array will contain the nodes of the graph, in topological order
         const sorted: PartialDefinition<F, S>[] = []
 
@@ -157,15 +117,14 @@ export class GenericFlagSetBuilder<F, S> {
             this._factory.precomputeBottomUp(sorted[i])
             dict.add(this._factory.createFlagDefinition(sorted[i]))
         }
-        return dict
-    }
+        return dict*/
 
-    private displayPartialDefinition(definition: PartialDefinition<F, S>): string {
+    /*private displayPartialDefinition(definition: PartialDefinition<F, S>): string {
         if (definition.alias) {
             return '"' + definition.alias + '"'
         } else {
             // generate the definition and try to print its base value
             return printFlagValue(this._factory.createFlagDefinition(definition))
         }
-    }
+    }*/
 }

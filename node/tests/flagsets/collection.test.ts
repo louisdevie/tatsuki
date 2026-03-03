@@ -19,9 +19,7 @@ describe(CollectionFlagSet, () => {
         expect(flags.union(set('A'), set())).toEqual(set('A'))
         expect(flags.union(set(), set('B'))).toEqual(set('B'))
         expect(flags.union(set('A'), set('B'))).toEqual(set('A', 'B'))
-        expect(flags.union(set('A', 'B'), set('B', 'C'))).toEqual(
-            set('A', 'B', 'C'),
-        )
+        expect(flags.union(set('A', 'B'), set('B', 'C'))).toEqual(set('A', 'B', 'C'))
     })
 
     test('difference', () => {
@@ -41,12 +39,8 @@ describe(CollectionFlagSet, () => {
         expect(flags.intersection(set('A'), set())).toEqual(set())
         expect(flags.intersection(set('A'), set('B'))).toEqual(set())
         expect(flags.intersection(set('A'), set('A', 'B'))).toEqual(set('A'))
-        expect(flags.intersection(set('A', 'B', 'D'), set('A', 'C'))).toEqual(
-            set('A'),
-        )
-        expect(
-            flags.intersection(set('A', 'B', 'D'), set('A', 'B', 'C')),
-        ).toEqual(set('A', 'B'))
+        expect(flags.intersection(set('A', 'B', 'D'), set('A', 'C'))).toEqual(set('A'))
+        expect(flags.intersection(set('A', 'B', 'D'), set('A', 'B', 'C'))).toEqual(set('A', 'B'))
     })
 
     test('isSuperset', () => {
@@ -65,10 +59,6 @@ describe(CollectionFlagSet, () => {
 
         expect([...flags.enumerate(set())]).toEqual([])
         expect([...flags.enumerate(set('A'))]).toEqual(['A'])
-        expect([...flags.enumerate(set('A', 'B', 'C'))]).toEqual([
-            'A',
-            'B',
-            'C',
-        ])
+        expect([...flags.enumerate(set('A', 'B', 'C'))]).toEqual(['A', 'B', 'C'])
     })
 })

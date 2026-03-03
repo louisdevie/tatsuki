@@ -75,6 +75,38 @@ describe(BitFlagSet, () => {
         expect(flags.isSuperset(8, 4)).toBe(false)
     })
 
+    test('hasAny', () => {
+        const flags = createBitFlagSet([
+            { value: 1, as: 'A' },
+            { value: 2, as: 'B', requires: ['A'] },
+            { value: 4, as: 'C', requires: ['A'] },
+            { value: 8, as: 'D', requires: ['B', 'C'] },
+        ])
+
+        expect(flags.hasAny(15, 0)).toBe(false)
+        expect(flags.hasAny(0, 0)).toBe(false)
+        expect(flags.hasAny(7, 1)).toBe(true)
+        expect(flags.hasAny(1, 7)).toBe(true)
+        expect(flags.hasAny(5, 12)).toBe(false)
+        expect(flags.hasAny(2, 2)).toBe(false)
+    })
+
+    test('hasAll', () => {
+        const flags = createBitFlagSet([
+            { value: 1, as: 'A' },
+            { value: 2, as: 'B', requires: ['A'] },
+            { value: 4, as: 'C', requires: ['A'] },
+            { value: 8, as: 'D', requires: ['B', 'C'] },
+        ])
+
+        expect(flags.hasAll(15, 0)).toBe(true)
+        expect(flags.hasAll(0, 0)).toBe(true)
+        expect(flags.hasAll(7, 2)).toBe(true)
+        expect(flags.hasAll(6, 2)).toBe(false)
+        expect(flags.hasAll(1, 7)).toBe(false)
+        expect(flags.hasAll(5, 12)).toBe(false)
+    })
+
     test('enumerate', () => {
         const flags = createBitFlagSet([])
 
@@ -84,5 +116,37 @@ describe(BitFlagSet, () => {
         expect([...flags.enumerate(3)]).toEqual([1, 2])
         expect([...flags.enumerate(11)]).toEqual([1, 2, 8])
         expect([...flags.enumerate(100)]).toEqual([4, 32, 64])
+    })
+
+    test('maximum', () => {
+        const flags = createBitFlagSet([
+            { value: 1, as: 'A' },
+            { value: 2, as: 'B', requires: ['A'] },
+            { value: 4, as: 'C', requires: ['A'] },
+            { value: 8, as: 'D', requires: ['B', 'C'] },
+        ])
+
+        expect(flags.maximum(0)).toEqual(0)
+        expect(flags.maximum(1)).toEqual(1)
+        expect(flags.maximum(2)).toEqual(3)
+        expect(flags.maximum(3)).toEqual(3)
+        expect(flags.maximum(4)).toEqual(5)
+        expect(flags.maximum(8)).toEqual(15)
+    })
+
+    test('minimum', () => {
+        const flags = createBitFlagSet([
+            { value: 1, as: 'A' },
+            { value: 2, as: 'B', requires: ['A'] },
+            { value: 4, as: 'C', requires: ['A'] },
+            { value: 8, as: 'D', requires: ['B', 'C'] },
+        ])
+
+        expect(flags.minimum(0)).toEqual(0)
+        expect(flags.minimum(1)).toEqual(1)
+        expect(flags.minimum(2)).toEqual(0)
+        expect(flags.minimum(3)).toEqual(3)
+        expect(flags.minimum(4)).toEqual(0)
+        expect(flags.minimum(13)).toEqual(5)
     })
 })

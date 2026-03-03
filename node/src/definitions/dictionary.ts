@@ -1,67 +1,48 @@
-import type { FlagDefinition } from '.'
-import { ReusedFlagAliasError, ReusedFlagValueError } from '../errors'
-
-/**
- * A collection of {@link FlagDefinition}s.
- */
 export interface FlagsDictionary<F, S> {
-    /**
-     * Search for a flag in the collection.
-     * @param alias The alias of the flag.
-     * @returns The corresponding definition, or `undefined` if there is no flag
-     *          with this alias.
-     */
     findByAlias(alias: string): FlagDefinition<F, S> | undefined
+
+    findByValue(value: F): FlagDefinition<F, S> | undefined
 }
 
-/**
- * Built-in dictionary implementation.
- * @internal
- */
-export class GenericFlagsDictionary<F, S> implements FlagsDictionary<F, S> {
-    private readonly _named: Map<string, FlagDefinition<F, S>>
-    private readonly _anonymous: FlagDefinition<F, S>[]
-
-    public constructor() {
-        this._named = new Map()
-        this._anonymous = []
-    }
-
-    public add(definition: FlagDefinition<F, S>): void {
-        if (definition.alias === undefined) {
-            this._anonymous.push(definition)
-        } else {
-            this._named.set(definition.alias, definition)
-        }
-    }
+export interface FlagDefinition<F, S> {
+    /**
+     * The alias of the flag.
+     */
+    readonly alias: string | undefined
 
     /**
-     * Search for a flag in the collection.
-     * @param alias The alias of the flag.
-     * @returns The corresponding definition, or `undefined` if there is no flag
-     *          with this alias.
+     * A set containing the value of the flag, or multiple values if it is a composed flag.
      */
-    public findByAlias(alias: string): FlagDefinition<F, S> | undefined {
-        return this._named.get(alias)
-    }
+    readonly values: S
+
+    /**
+     * Test if this flag and all its parents are present in the set.
+     * @param set A set of flags.
+     * @returns `true` if the set includes this flags and its parents.
+     */
+    isIn(set: S): boolean
+
+    /**
+     * Add this flag and all its parents to the set.
+     * @param set A set of flags.
+     * @returns A new set of flags containing the flags from the `set`, this flag and its parents.
+     */
+    addTo(set: S): S
+
+    /**
+     * Removes this flag and all its children from the set.
+     * @param set A set of flags.
+     * @returns A new set of flags containing the flags from the `set` except this flag and its children.
+     */
+    removeFrom(set: S): S
 }
 
-/*
-    public define(definition: FlagDefinition<F, S>) {
-        for (const other of this._named.values()) {
-            if (
-                definition.alias !== undefined &&
-                definition.alias === other.alias
-            ) {
-                throw new ReusedFlagAliasError(definition.alias)
-            }
-            if (definition.hasSameValue(other)) {
-                throw new ReusedFlagValueError(definition, other)
-            }
-        }
-        for (const other of this._anonymous) {
-            if (definition.hasSameValue(other)) {
-                throw new ReusedFlagValueError(definition, other)
-            }
-        }
- */
+export const valueToString = Symbol()
+
+export function printFlagValue(flag: FlagDefinition<unknown, unknown>): string {
+    if (valueToString in flag) {
+        return (flag[valueToString] as Function)()
+    } else {
+        return String(flag.values)
+    }
+}

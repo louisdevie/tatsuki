@@ -36,10 +36,7 @@ describe(ArrayFlagSet, () => {
         expect(flags.intersection(['A'], ['B'])).toEqual([])
         expect(flags.intersection(['A'], ['A', 'B'])).toEqual(['A'])
         expect(flags.intersection(['A', 'B', 'D'], ['A', 'C'])).toEqual(['A'])
-        expect(flags.intersection(['A', 'B', 'D'], ['A', 'B', 'C'])).toEqual([
-            'A',
-            'B',
-        ])
+        expect(flags.intersection(['A', 'B', 'D'], ['A', 'B', 'C'])).toEqual(['A', 'B'])
     })
 
     test('isSuperset', () => {

@@ -1,5 +1,5 @@
-export { FlagSetBuilder, createBitFlagSet } from './builders'
-export { FlagDefinition, FlagsDictionary } from './definitions'
+export { createBitFlagSet } from './builders'
+export { FlagDefinition } from './definitions'
 export { InvalidBitFlagValueError } from './errors'
 export {
     ArrayFlagSet,
