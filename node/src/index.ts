@@ -6,6 +6,7 @@ export {
     Base64BitFlagSet,
     BigBitFlagSet,
     BitFlagSet,
+    BitFlags,
     CollectionFlagSet,
     FlagSet,
 } from './flagsets'

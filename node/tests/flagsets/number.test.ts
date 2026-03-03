@@ -1,4 +1,4 @@
-import { BitFlagSet, createBitFlagSet } from '~'
+import { BitFlags, BitFlagSet, createBitFlagSet } from '~'
 import { describe, expect, test } from 'vitest'
 
 describe(BitFlagSet, () => {
@@ -34,45 +34,37 @@ describe(BitFlagSet, () => {
     })
 
     test('union', () => {
-        const flags = createBitFlagSet([])
-
-        expect(flags.union(0, 0)).toEqual(0)
-        expect(flags.union(1, 0)).toEqual(1)
-        expect(flags.union(0, 2)).toEqual(2)
-        expect(flags.union(1, 2)).toEqual(3)
-        expect(flags.union(3, 6)).toEqual(7)
+        expect(BitFlags.union(0, 0)).toEqual(0)
+        expect(BitFlags.union(1, 0)).toEqual(1)
+        expect(BitFlags.union(0, 2)).toEqual(2)
+        expect(BitFlags.union(1, 2)).toEqual(3)
+        expect(BitFlags.union(3, 6)).toEqual(7)
     })
 
     test('difference', () => {
-        const flags = createBitFlagSet([])
-
-        expect(flags.difference(0, 0)).toEqual(0)
-        expect(flags.difference(1, 0)).toEqual(1)
-        expect(flags.difference(3, 6)).toEqual(1)
-        expect(flags.difference(6, 3)).toEqual(4)
-        expect(flags.difference(8, 17)).toEqual(8)
+        expect(BitFlags.difference(0, 0)).toEqual(0)
+        expect(BitFlags.difference(1, 0)).toEqual(1)
+        expect(BitFlags.difference(3, 6)).toEqual(1)
+        expect(BitFlags.difference(6, 3)).toEqual(4)
+        expect(BitFlags.difference(8, 17)).toEqual(8)
     })
 
     test('intersection', () => {
-        const flags = createBitFlagSet([])
-
-        expect(flags.intersection(0, 0)).toEqual(0)
-        expect(flags.intersection(1, 0)).toEqual(0)
-        expect(flags.intersection(1, 2)).toEqual(0)
-        expect(flags.intersection(1, 3)).toEqual(1)
-        expect(flags.intersection(11, 5)).toEqual(1)
-        expect(flags.intersection(11, 7)).toEqual(3)
+        expect(BitFlags.intersection(0, 0)).toEqual(0)
+        expect(BitFlags.intersection(1, 0)).toEqual(0)
+        expect(BitFlags.intersection(1, 2)).toEqual(0)
+        expect(BitFlags.intersection(1, 3)).toEqual(1)
+        expect(BitFlags.intersection(11, 5)).toEqual(1)
+        expect(BitFlags.intersection(11, 7)).toEqual(3)
     })
 
     test('isSuperset', () => {
-        const flags = createBitFlagSet([])
-
-        expect(flags.isSuperset(0, 0)).toBe(true)
-        expect(flags.isSuperset(3, 0)).toBe(true)
-        expect(flags.isSuperset(3, 1)).toBe(true)
-        expect(flags.isSuperset(3, 3)).toBe(true)
-        expect(flags.isSuperset(0, 3)).toBe(false)
-        expect(flags.isSuperset(8, 4)).toBe(false)
+        expect(BitFlags.isSuperset(0, 0)).toBe(true)
+        expect(BitFlags.isSuperset(3, 0)).toBe(true)
+        expect(BitFlags.isSuperset(3, 1)).toBe(true)
+        expect(BitFlags.isSuperset(3, 3)).toBe(true)
+        expect(BitFlags.isSuperset(0, 3)).toBe(false)
+        expect(BitFlags.isSuperset(8, 4)).toBe(false)
     })
 
     test('hasAny', () => {
@@ -108,14 +100,12 @@ describe(BitFlagSet, () => {
     })
 
     test('enumerate', () => {
-        const flags = createBitFlagSet([])
-
-        expect([...flags.enumerate(0)]).toEqual([])
-        expect([...flags.enumerate(1)]).toEqual([1])
-        expect([...flags.enumerate(2)]).toEqual([2])
-        expect([...flags.enumerate(3)]).toEqual([1, 2])
-        expect([...flags.enumerate(11)]).toEqual([1, 2, 8])
-        expect([...flags.enumerate(100)]).toEqual([4, 32, 64])
+        expect([...BitFlags.enumerate(0)]).toEqual([])
+        expect([...BitFlags.enumerate(1)]).toEqual([1])
+        expect([...BitFlags.enumerate(2)]).toEqual([2])
+        expect([...BitFlags.enumerate(3)]).toEqual([1, 2])
+        expect([...BitFlags.enumerate(11)]).toEqual([1, 2, 8])
+        expect([...BitFlags.enumerate(100)]).toEqual([4, 32, 64])
     })
 
     test('maximum', () => {
