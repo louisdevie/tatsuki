@@ -1,5 +1,6 @@
-import { CollectionFlagSet } from '~'
 import { describe, expect, test } from 'vitest'
+
+import { CollectionFlagSet, createCollectionFlagSet } from '~'
 
 function set<T>(...values: T[]): Set<T> {
     return new Set<T>(values)
@@ -7,13 +8,34 @@ function set<T>(...values: T[]): Set<T> {
 
 describe(CollectionFlagSet, () => {
     test('none', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect(flags.none()).toEqual(set())
     })
 
+    test('of', () => {
+        const flags = createCollectionFlagSet<string>([])
+
+        expect(flags.of()).toEqual(set())
+        expect(flags.of('a')).toEqual(set('a'))
+        expect(flags.of('x', 'y', 'z')).toEqual(set('x', 'y', 'z'))
+    })
+
+    test('named', () => {
+        const flags = createCollectionFlagSet([
+            { value: 12, as: 'a' },
+            { value: 45, as: 'b' },
+            { value: 78, as: 'c' },
+            { compose: ['a', 'b'], as: 'ab' },
+        ])
+
+        expect(flags.named()).toEqual(set())
+        expect(flags.named('a')).toEqual(set(12))
+        expect(flags.named('ab', 'c')).toEqual(set(12, 45, 78))
+    })
+
     test('union', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect(flags.union(set(), set())).toEqual(set())
         expect(flags.union(set('A'), set())).toEqual(set('A'))
@@ -23,7 +45,7 @@ describe(CollectionFlagSet, () => {
     })
 
     test('difference', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect(flags.difference(set(), set())).toEqual(set())
         expect(flags.difference(set('A'), set())).toEqual(set('A'))
@@ -33,7 +55,7 @@ describe(CollectionFlagSet, () => {
     })
 
     test('intersection', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect(flags.intersection(set(), set())).toEqual(set())
         expect(flags.intersection(set('A'), set())).toEqual(set())
@@ -44,7 +66,7 @@ describe(CollectionFlagSet, () => {
     })
 
     test('isSuperset', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect(flags.isSuperset(set(), set())).toBe(true)
         expect(flags.isSuperset(set('A', 'B'), set())).toBe(true)
@@ -55,7 +77,7 @@ describe(CollectionFlagSet, () => {
     })
 
     test('enumerate', () => {
-        const flags = new CollectionFlagSet<string>()
+        const flags = createCollectionFlagSet<string>([])
 
         expect([...flags.enumerate(set())]).toEqual([])
         expect([...flags.enumerate(set('A'))]).toEqual(['A'])

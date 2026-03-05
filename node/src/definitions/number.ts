@@ -6,7 +6,7 @@ interface PrecomputedValues {
     subtractive: number
 }
 
-export class BitFlagDefinition implements FlagDefinition<number, number> {
+export class BitFlagDefinition implements FlagDefinition<number> {
     private readonly _baseValue: number
     private readonly _additiveValue: number
     private readonly _subtractiveValue: number
@@ -43,7 +43,7 @@ export class BitFlagDefinition implements FlagDefinition<number, number> {
 export class BitFlagDefinitionFactory implements FlagDefinitionFactory<number, number> {
     public makeDefinitions(
         sortedPartialDefinitions: PartialFlagDefinition<number>[],
-        results: Map<PartialFlagDefinition<number>, FlagDefinition<number, number>>,
+        results: Map<PartialFlagDefinition<number>, FlagDefinition<number>>,
     ): void {
         const precomputedValues = new Map<PartialFlagDefinition<number>, PrecomputedValues>()
 

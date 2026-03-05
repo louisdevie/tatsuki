@@ -1,4 +1,4 @@
-export { createBitFlagSet } from './builders'
+export { createBitFlagSet, createCollectionFlagSet } from './builders'
 export { FlagDefinition } from './definitions'
 export { InvalidBitFlagValueError } from './errors'
 export {

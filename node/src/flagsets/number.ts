@@ -91,28 +91,28 @@ export class BitFlagSet implements FlagSet<number, number> {
     }
 
     public maximum(flags: number): number {
-        let result = this.none()
+        let result = 0
         for (const value of this.enumerate(flags)) {
-            const flag = this._dictionary.findByValue(value)
-            if (flag !== undefined) {
-                result = flag.addTo(result)
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined) {
+                result = definition.addTo(result)
             }
         }
         return result
     }
 
     public minimum(flags: number): number {
-        let result = this.none()
+        let result = 0
         for (const value of this.enumerate(flags)) {
-            const flag = this._dictionary.findByValue(value)
-            if (flag !== undefined && flag.isIn(flags)) {
-                result = flag.addTo(result)
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined && definition.isIn(flags)) {
+                result = definition.addTo(result)
             }
         }
         return result
     }
 
-    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
+    public getFlag(alias: string): FlagDefinition<number> | undefined {
         return this._dictionary.findByAlias(alias)
     }
 }

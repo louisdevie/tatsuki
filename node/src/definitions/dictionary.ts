@@ -1,10 +1,10 @@
 export interface FlagsDictionary<F, S> {
-    findByAlias(alias: string): FlagDefinition<F, S> | undefined
+    findByAlias(alias: string): FlagDefinition<S> | undefined
 
-    findByValue(value: F): FlagDefinition<F, S> | undefined
+    findByValue(value: F): FlagDefinition<S> | undefined
 }
 
-export interface FlagDefinition<F, S> {
+export interface FlagDefinition<S> {
     /**
      * The alias of the flag.
      */
@@ -39,9 +39,9 @@ export interface FlagDefinition<F, S> {
 
 export const valueToString = Symbol()
 
-export function printFlagValue(flag: FlagDefinition<unknown, unknown>): string {
+export function printFlagValue(flag: FlagDefinition<unknown>): string {
     if (valueToString in flag) {
-        return (flag[valueToString] as Function)()
+        return (flag[valueToString] as () => string)()
     } else {
         return String(flag.values)
     }

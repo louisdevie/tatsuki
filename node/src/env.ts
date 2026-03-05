@@ -11,18 +11,12 @@ export const ENV_BI = Object.freeze(
 type SetBinaryOperation = <T>(this: Set<T>, other: Set<T>) => Set<T>
 type SetBinaryPredicate = <T>(this: Set<T>, other: Set<T>) => boolean
 
-export const ENV_SET = Object.freeze(
-    typeof Set === 'function'
-        ? {
-              AVAILABLE: true,
-              union: polyfillUnion(Set.prototype),
-              intersection: polyfillIntersection(Set.prototype),
-              difference: polyfillDifference(Set.prototype),
-              isSupersetOf: polyfillIsSupersetOf(Set.prototype),
-          }
-        : { AVAILABLE: false },
-) as {
-    readonly AVAILABLE: boolean
+export const ENV_SET = Object.freeze({
+    union: polyfillUnion(Set.prototype),
+    intersection: polyfillIntersection(Set.prototype),
+    difference: polyfillDifference(Set.prototype),
+    isSupersetOf: polyfillIsSupersetOf(Set.prototype),
+}) as {
     readonly union: SetBinaryOperation
     readonly intersection: SetBinaryOperation
     readonly difference: SetBinaryOperation
