@@ -1,22 +1,20 @@
+import { FlagDefinition } from '~/definitions'
+import { CollectionFlagDefinitionFactory } from '~/definitions/collection'
 import { CollectionFlagSet } from '~/flagsets'
+
 import {
     applyDeclarations,
     FlagWithValue,
-    FlagWithValueOrOrdinal,
     ListOfFlagsWithValue,
-    ListOfFlagsWithValueOrOrdinal,
     NamedFlagWithValue,
-    NamedFlagWithValueOrOrdinal,
 } from './declarative'
-import { FlagDefinition } from '~/definitions'
+import { FlagSetBuilder } from './generic'
 import {
     DefineWithValueOrOrdinal,
     RequireParentsOrDefineWithValueOrOrdinal,
     WithValueOrOrdinal,
     WithValueOrOrdinalOrCompose,
 } from './syntax'
-import { FlagSetBuilder } from './generic'
-import { CollectionFlagDefinitionFactory } from '~/definitions/collection'
 
 export class CollectionFlagSetBuilder<T>
     implements
