@@ -1,31 +1,29 @@
+import { FlagDefinition, FlagsDictionary } from '~/definitions'
+import { BigBitFlagsIterator, EnumerateFlags, useIterator } from '~/enumeration'
+import { ENV_BI } from '~/env'
+
 import type { FlagSet } from '.'
-import { UnavailableFeatureError } from '../errors'
-import { ENV_BI } from '../env'
-import { BigBitFlagsIterator, EnumerateFlags, useIterator } from '../enumeration'
 
 export class BigBitFlagSet implements FlagSet<bigint, bigint> {
-    /**
-     * Creates a new empty flag set.
-     *
-     * @throws UnavailableFeatureError When this constructor is called in an
-     *         environment that does not natively support {@link BigInt}s.
-     */
-    public constructor() {
-        if (!ENV_BI.AVAILABLE) {
-            throw new UnavailableFeatureError('BigInts')
-        }
-    }
+    private readonly _dictionary: FlagsDictionary<bigint, bigint>
 
-    minimum(flags: bigint): bigint {
-        throw new Error('Method not implemented.')
-    }
-
-    maximum(flags: bigint): bigint {
-        throw new Error('Method not implemented.')
+    public constructor(dictionary: FlagsDictionary<bigint, bigint>) {
+        this._dictionary = dictionary
     }
 
     public none(): bigint {
         return ENV_BI.ZERO
+    }
+
+    public of(...values: bigint[]): bigint {
+        return values.reduce((set, value) => set | value, ENV_BI.ZERO)
+    }
+
+    public named(...aliases: string[]): bigint {
+        return aliases.reduce(
+            (set, alias) => set | (this.getFlag(alias)?.values ?? ENV_BI.ZERO),
+            ENV_BI.ZERO,
+        )
     }
 
     public union(first: bigint, second: bigint): bigint {
@@ -44,11 +42,41 @@ export class BigBitFlagSet implements FlagSet<bigint, bigint> {
         return (first & second) == second
     }
 
+    public hasAny(flags: bigint, required: bigint): boolean {
+        return this.minimum(this.intersection(flags, required)) !== ENV_BI.ZERO
+    }
+
+    public hasAll(flags: bigint, required: bigint): boolean {
+        return this.isSuperset(flags, this.maximum(required))
+    }
+
     public enumerate(flags: bigint): EnumerateFlags<bigint> {
         return useIterator(flags, BigBitFlagsIterator)
     }
 
-    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
-        return this._dictionary.lookUp(alias)
+    public maximum(flags: bigint): bigint {
+        let result = ENV_BI.ZERO
+        for (const value of this.enumerate(flags)) {
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined) {
+                result = definition.addTo(result)
+            }
+        }
+        return result
+    }
+
+    public minimum(flags: bigint): bigint {
+        let result = ENV_BI.ZERO
+        for (const value of this.enumerate(flags)) {
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined && definition.isIn(flags)) {
+                result = definition.addTo(result)
+            }
+        }
+        return result
+    }
+
+    public getFlag(alias: string): FlagDefinition<bigint> | undefined {
+        return this._dictionary.findByAlias(alias)
     }
 }

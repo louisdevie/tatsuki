@@ -1,46 +1,66 @@
-import type { FlagSet } from '.'
-import { BitFlagsIterator, EnumerateFlags, useIterator } from '~/enumeration'
 import { FlagDefinition, FlagsDictionary } from '~/definitions'
+import { BigBitFlagsIterator, BitFlagsIterator, EnumerateFlags, useIterator } from '~/enumeration'
+
+import type { FlagSet } from '.'
 
 export const BitFlags = {
+    union<T extends number | bigint>(first: T, second: T): T {
+        return (first | second) as T
+    },
+
+    intersection<T extends number | bigint>(first: T, second: T): T {
+        return (first & second) as T
+    },
+
+    difference<T extends number | bigint>(first: T, second: T): T {
+        return (first & ~second) as T
+    },
+
+    isSuperset<T extends number | bigint>(first: T, second: T): boolean {
+        return (first & second) === second
+    },
+
+    enumerate<T extends number | bigint>(flags: T): EnumerateFlags<T> {
+        if (typeof flags === 'number') {
+            return useIterator(flags, BitFlagsIterator) as EnumerateFlags<T>
+        } else {
+            return useIterator(flags, BigBitFlagsIterator) as EnumerateFlags<T>
+        }
+    },
+} as {
     /**
      * Computes the union of two sets of bitflags.
      * Any bits that are set in either of the inputs will be set in the result.
      */
-    union(first: number, second: number): number {
-        return first | second
-    },
+    union(first: number, second: number): number
+    union(first: bigint, second: bigint): bigint
 
     /**
      * Computes the intersection of two sets of bitflags.
      * Only bits that are set in both of the inputs will be set in the result.
      */
-    intersection(first: number, second: number): number {
-        return first & second
-    },
+    intersection(first: number, second: number): number
+    intersection(first: bigint, second: bigint): bigint
 
     /**
      * Computes the difference between two sets of bitflags.
      * Only bits that are set in the first input and not set in the second will be set in the result.
      */
-    difference(first: number, second: number): number {
-        return first & ~second
-    },
+    difference(first: number, second: number): number
+    difference(first: bigint, second: bigint): bigint
 
     /**
      * Tests if a set of bitflags is a superset of the other.
      * Return `true` if every bit that is set in the second input is also set in the first.
      */
-    isSuperset(first: number, second: number): boolean {
-        return (first & second) === second
-    },
+    isSuperset(first: number, second: number): boolean
+    isSuperset(first: bigint, second: bigint): boolean
 
     /**
      * Returns an iterable over the individual bits that are set.
      */
-    enumerate(flags: number): EnumerateFlags<number> {
-        return useIterator(flags, BitFlagsIterator)
-    },
+    enumerate(flags: number): EnumerateFlags<number>
+    enumerate(flags: bigint): EnumerateFlags<bigint>
 }
 
 export class BitFlagSet implements FlagSet<number, number> {

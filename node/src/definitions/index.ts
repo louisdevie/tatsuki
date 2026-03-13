@@ -1,9 +1,10 @@
-export { FlagsDictionary, FlagDefinition, printFlagValue, valueToString } from './dictionary'
+export { BigBitFlagDefinition, BigBitFlagDefinitionFactory } from './bigint'
+export { FlagDefinition, FlagsDictionary, printFlagValue, valueToString } from './dictionary'
 export {
-    FlagsGraph,
-    PartialFlagInit,
-    PartialFlagDefinition,
-    refByAlias,
     FlagDefinitionFactory,
+    FlagsGraph,
+    PartialFlagDefinition,
+    PartialFlagInit,
+    refByAlias,
 } from './graph'
 export { BitFlagDefinition, BitFlagDefinitionFactory } from './number'
