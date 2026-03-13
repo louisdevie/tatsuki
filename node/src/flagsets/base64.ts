@@ -1,6 +1,18 @@
+import { decodeB64Byte, encodeB64Byte, normaliseB64String, ZERO_STRING } from '~/base64'
+import { FlagDefinition, FlagsDictionary } from '~/definitions'
+import { Base64BitflagIterator, EnumerateFlags, useIterator } from '~/enumeration'
+
 import type { FlagSet } from '.'
-import { decodeB64Byte, encodeB64Byte, normaliseB64String, ZERO_STRING } from '../base64'
-import { Base64BitflagIterator, EnumerateFlags, useIterator } from '../enumeration'
+
+function toBase64(value: number): string {
+    if (value < 1) {
+        throw new RangeError('Indices should be greater than or equal to 1.')
+    }
+    const indexFromZero = value - 1
+    const leadingBytes = ZERO_STRING.repeat(indexFromZero / 6)
+    const bigEnd = encodeB64Byte(1 << indexFromZero % 6)
+    return leadingBytes + bigEnd
+}
 
 /**
  * Provides flags that are stored in strings using a little-endian base 64
@@ -11,20 +23,29 @@ import { Base64BitflagIterator, EnumerateFlags, useIterator } from '../enumerati
  * instead if you need the data to be easily understandable by other systems.
  */
 export class Base64BitFlagSet implements FlagSet<number, string> {
-    /*protected wrapValue(value: number): string {
-        if (value < 1) {
-            throw new RangeError(
-                'Indices should be greater than or equal to 1.'
-            )
-        }
-        const indexFromZero = value - 1
-        const leadingBytes = ZERO_STRING.repeat(indexFromZero / 6)
-        const bigEnd = encodeByte(1 << indexFromZero % 6)
-        return leadingBytes + bigEnd
-    }*/
+    private readonly _dictionary: FlagsDictionary<number, string>
+
+    public constructor(dictionary: FlagsDictionary<number, string>) {
+        this._dictionary = dictionary
+    }
 
     public none(): string {
         return ''
+    }
+
+    public of(...values: number[]): string {
+        return normaliseB64String(
+            values.reduce((set, value) => this.union(set, toBase64(value)), ZERO_STRING),
+        )
+    }
+
+    public named(...aliases: string[]): string {
+        return normaliseB64String(
+            aliases.reduce(
+                (set, alias) => this.union(set, this.getFlag(alias)?.values ?? ZERO_STRING),
+                ZERO_STRING,
+            ),
+        )
     }
 
     public union(first: string, second: string): string {
@@ -107,19 +128,41 @@ export class Base64BitFlagSet implements FlagSet<number, string> {
         return result
     }
 
+    public hasAny(flags: string, required: string): boolean {
+        return this.minimum(this.intersection(flags, required)) !== ''
+    }
+
+    public hasAll(flags: string, required: string): boolean {
+        return this.isSuperset(flags, this.maximum(required))
+    }
+
     public enumerate(flags: string): EnumerateFlags<number> {
         return useIterator(flags, Base64BitflagIterator)
     }
 
-    maximum(flags: string): string {
-        throw new Error('not implemented')
+    public maximum(flags: string): string {
+        let result = ZERO_STRING
+        for (const value of this.enumerate(flags)) {
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined) {
+                result = definition.addTo(result)
+            }
+        }
+        return normaliseB64String(result)
     }
 
-    minimum(flags: string): string {
-        throw new Error('not implemented')
+    public minimum(flags: string): string {
+        let result = ZERO_STRING
+        for (const value of this.enumerate(flags)) {
+            const definition = this._dictionary.findByValue(value)
+            if (definition !== undefined && definition.isIn(flags)) {
+                result = definition.addTo(result)
+            }
+        }
+        return normaliseB64String(result)
     }
 
-    public getFlag(alias: string): FlagDefinition<number, number> | undefined {
-        return this._dictionary.lookUp(alias)
+    public getFlag(alias: string): FlagDefinition<string> | undefined {
+        return this._dictionary.findByAlias(alias)
     }
 }

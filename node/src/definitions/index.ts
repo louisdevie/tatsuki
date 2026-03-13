@@ -1,3 +1,4 @@
+export { Base64BitFlagDefinition, Base64BitFlagDefinitionFactory } from './base64'
 export { BigBitFlagDefinition, BigBitFlagDefinitionFactory } from './bigint'
 export { FlagDefinition, FlagsDictionary, printFlagValue, valueToString } from './dictionary'
 export {

@@ -1,4 +1,4 @@
-import type { FlagsDictionary, FlagSet } from '~'
+import type { FlagSet } from '~'
 
 export interface Root<F, S, R = FlagSet<F, S>> {
     /**
@@ -48,42 +48,42 @@ export interface RequireParentsOrDefineWithValue<F, S, R> extends DefineWithValu
 
 // Syntax for builders that supports only definitions by ordinal
 
-export interface DefineWithOrdinal<F, S, R = FlagSet<F, S>> extends Root<F, S, R> {
+export interface DefineWithOrdinal<S, R = FlagSet<number, S>> extends Root<number, S, R> {
     /**
      * Define an anonymous flag.
      */
-    define(): WithOrdinal<F, S, R>
+    define(): WithOrdinal<S, R>
 
     /**
      * Define a named flag.
      * @param alias The name of the flag.
      */
-    define(alias: string): WithOrdinalOrCompose<F, S, R>
+    define(alias: string): WithOrdinalOrCompose<S, R>
 }
 
-export interface WithOrdinal<F, S, R> {
+export interface WithOrdinal<S, R> {
     /**
      * Set the value of this flag.
      * @param ordinal The number of the flag (starting at 1). A unique value
      *                will be assigned based on this number.
      */
-    withOrdinal(ordinal: number): RequireParentsOrDefineWithOrdinal<F, S, R>
+    withOrdinal(ordinal: number): RequireParentsOrDefineWithOrdinal<S, R>
 }
 
-export interface WithOrdinalOrCompose<F, S, R> extends WithOrdinal<F, S, R> {
+export interface WithOrdinalOrCompose<S, R> extends WithOrdinal<S, R> {
     /**
      * Define this flag as a composed flag.
      * @param flags The name of the flags in the group.
      */
-    compose(...flags: string[]): DefineWithOrdinal<F, S, R>
+    compose(...flags: string[]): DefineWithOrdinal<S, R>
 }
 
-export interface RequireParentsOrDefineWithOrdinal<F, S, R> extends DefineWithOrdinal<F, S, R> {
+export interface RequireParentsOrDefineWithOrdinal<S, R> extends DefineWithOrdinal<S, R> {
     /**
      * Set the parents of this flag.
      * @param flags The names of the parent flags.
      */
-    requires(...flags: string[]): DefineWithOrdinal<F, S, R>
+    requires(...flags: string[]): DefineWithOrdinal<S, R>
 }
 
 // Syntax for builders that supports definitions by value and ordinal
@@ -124,11 +124,8 @@ export interface WithValueOrOrdinalOrCompose<F, S, R> extends WithValueOrOrdinal
     compose(...flags: string[]): DefineWithValueOrOrdinal<F, S, R>
 }
 
-export interface RequireParentsOrDefineWithValueOrOrdinal<F, S, R> extends DefineWithValueOrOrdinal<
-    F,
-    S,
-    R
-> {
+export interface RequireParentsOrDefineWithValueOrOrdinal<F, S, R>
+    extends DefineWithValueOrOrdinal<F, S, R> {
     /**
      * Set the parents of this flag.
      * @param flags The names of the parent flags.

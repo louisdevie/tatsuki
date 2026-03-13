@@ -1,4 +1,4 @@
-import { FlagDefinition, FlagsDictionary, printFlagValue } from '~/definitions'
+import { FlagDefinition, FlagsDictionary } from '~/definitions'
 import { InternalError } from '~/errors'
 
 export interface PartialFlagInit<F> {
@@ -14,7 +14,7 @@ export function refByAlias(refs: string[]): PartialFlagInit<never>[] {
 export interface FlagDefinitionFactory<F, S> {
     makeDefinitions(
         sortedPartialDefinitions: PartialFlagDefinition<F>[],
-        results: Map<PartialFlagDefinition<F>, FlagDefinition<F, S>>,
+        results: Map<PartialFlagDefinition<F>, FlagDefinition<S>>,
     ): void
 }
 
@@ -130,23 +130,27 @@ export class FlagsGraph<F> {
     public intoDictionary<S>(factory: FlagDefinitionFactory<F, S>): FlagsDictionary<F, S> {
         const sortedPartialDefinitions = this.sortedDefinitions()
 
-        const definitions = new Map<PartialFlagDefinition<F>, FlagDefinition<F, S>>()
+        const definitions = new Map<PartialFlagDefinition<F>, FlagDefinition<S>>()
         factory.makeDefinitions(sortedPartialDefinitions, definitions)
 
-        const aliasToDefinition = new Map<string, FlagDefinition<F, S>>()
+        const aliasToDefinition = new Map<string, FlagDefinition<S>>()
         for (const [alias, pfd] of this._aliasToDefinition.entries()) {
             const definition = definitions.get(pfd)
             if (definition === undefined) {
-                throw new InternalError(`factory didn't provide any definition for ${pfd}`)
+                throw new InternalError(
+                    `factory didn't provide any definition for ${pfd.toString()}`,
+                )
             }
             aliasToDefinition.set(alias, definition)
         }
 
-        const valueToDefinition = new Map<F, FlagDefinition<F, S>>()
+        const valueToDefinition = new Map<F, FlagDefinition<S>>()
         for (const [value, pfd] of this._valueToDefinition.entries()) {
             const definition = definitions.get(pfd)
             if (definition === undefined) {
-                throw new InternalError(`factory didn't provide any definition for ${pfd}`)
+                throw new InternalError(
+                    `factory didn't provide any definition for ${pfd.toString()}`,
+                )
             }
             valueToDefinition.set(value, definition)
         }
@@ -156,22 +160,22 @@ export class FlagsGraph<F> {
 }
 
 class BiMapFlagsDictionary<F, S> implements FlagsDictionary<F, S> {
-    private readonly _aliasToDefinition: Map<string, FlagDefinition<F, S>>
-    private readonly _valueToDefinition: Map<F, FlagDefinition<F, S>>
+    private readonly _aliasToDefinition: Map<string, FlagDefinition<S>>
+    private readonly _valueToDefinition: Map<F, FlagDefinition<S>>
 
     public constructor(
-        aliasToDefinition: Map<string, FlagDefinition<F, S>>,
-        valueToDefinition: Map<F, FlagDefinition<F, S>>,
+        aliasToDefinition: Map<string, FlagDefinition<S>>,
+        valueToDefinition: Map<F, FlagDefinition<S>>,
     ) {
         this._aliasToDefinition = aliasToDefinition
         this._valueToDefinition = valueToDefinition
     }
 
-    public findByAlias(alias: string): FlagDefinition<F, S> | undefined {
+    public findByAlias(alias: string): FlagDefinition<S> | undefined {
         return this._aliasToDefinition.get(alias)
     }
 
-    public findByValue(value: F): FlagDefinition<F, S> | undefined {
+    public findByValue(value: F): FlagDefinition<S> | undefined {
         return this._valueToDefinition.get(value)
     }
 }

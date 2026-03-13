@@ -3,6 +3,7 @@ export {
     createBigBitFlagSet,
     createBitFlagSet,
     createCollectionFlagSet,
+    createBase64BitFlagSet,
 } from './builders'
 export { FlagDefinition } from './definitions'
 export { InvalidBitFlagValueError } from './errors'

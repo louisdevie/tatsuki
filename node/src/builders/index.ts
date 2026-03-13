@@ -1,4 +1,5 @@
 export { ArrayFlagSetBuilder, createArrayFlagSet } from './array'
+export { Base64BitFlagSetBuilder, createBase64BitFlagSet } from './base64'
 export { BigBitFlagSetBuilder, createBigBitFlagSet } from './bigint'
 export { CollectionFlagSetBuilder, createCollectionFlagSet } from './collection'
 export { BitFlagSetBuilder, createBitFlagSet } from './number'

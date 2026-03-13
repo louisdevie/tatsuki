@@ -1,5 +1,5 @@
-import { EnumerateFlags } from '../enumeration'
-import { FlagDefinition } from '../definitions'
+import { FlagDefinition } from '~/definitions'
+import { EnumerateFlags } from '~/enumeration'
 
 /**
  * Represents a group of flags of type `F` and the relationships between
@@ -128,11 +128,11 @@ export interface FlagSet<F, S> {
      * @returns The corresponding definition, or `undefined` if there is no flag
      *          with this alias.
      */
-    getFlag(alias: string): FlagDefinition<F, S> | undefined
+    getFlag(alias: string): FlagDefinition<S> | undefined
 }
 
 export { ArrayFlagSet } from './array'
 export { Base64BitFlagSet } from './base64'
 export { BigBitFlagSet } from './bigint'
 export { CollectionFlagSet } from './collection'
-export { BitFlagSet, BitFlags } from './number'
+export { BitFlags, BitFlagSet } from './number'

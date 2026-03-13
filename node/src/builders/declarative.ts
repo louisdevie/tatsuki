@@ -1,15 +1,4 @@
-import type { DefineWithOrdinal, DefineWithValue, DefineWithValueOrOrdinal } from './syntax'
-import { FlagsGraph, refByAlias } from '~/definitions'
-
-// Generic helper functions
-
-/**
- * Copies the record keys into the 'as' property of the values and return an
- * array containing those values.
- */
-function toDeclarationArray<D>(record: Record<string, D>): (D & { as: string })[] {
-    return Object.keys(record).map((key) => ({ ...record[key], as: key }))
-}
+import type { DefineWithValueOrOrdinal } from './syntax'
 
 // Declarations for builders that supports only definitions by value
 
@@ -23,17 +12,13 @@ export type ListOfFlagsWithValue<F> = FlagWithValue<F>[] | Record<string, NamedF
 
 // Declarations for builders that supports only definitions by ordinal
 
-export type FlagWithOrdinal<F> =
+export type FlagWithOrdinal =
     | { ordinal: number; as?: string; requires?: string[] }
     | { compose: string[]; as: string }
 
-export type NamedFlagWithOrdinal<F> =
-    | { ordinal: number; requires?: string[] }
-    | { compose: string[] }
+export type NamedFlagWithOrdinal = { ordinal: number; requires?: string[] } | { compose: string[] }
 
-export type ListOfFlagsWithOrdinal<F> =
-    | FlagWithOrdinal<F>[]
-    | Record<string, NamedFlagWithOrdinal<F>>
+export type ListOfFlagsWithOrdinal = FlagWithOrdinal[] | Record<string, NamedFlagWithOrdinal>
 
 // Declarations for builders that supports definitions by value and ordinal
 
@@ -51,27 +36,43 @@ export type ListOfFlagsWithValueOrOrdinal<F> =
     | FlagWithValueOrOrdinal<F>[]
     | Record<string, NamedFlagWithValueOrOrdinal<F>>
 
+// Helper function
+
+export interface AnyBuilder<F> {
+    define(alias: string | undefined): unknown
+    compose(...flags: string[]): unknown
+    withOrdinal(ordinal: number): unknown
+    withValue(value: F): unknown
+    requires(...flags: string[]): unknown
+}
+
 export function applyDeclarations<F>(
     declarations: ListOfFlagsWithValueOrOrdinal<F>,
-    builder: DefineWithValueOrOrdinal<F, unknown, unknown>,
+    builder: AnyBuilder<F>,
 ) {
-    const declarationsArray = Array.isArray(declarations)
-        ? declarations
-        : toDeclarationArray(declarations)
+    let declarationsArray: FlagWithValueOrOrdinal<F>[]
+    if (Array.isArray(declarations)) {
+        declarationsArray = declarations
+    } else {
+        declarationsArray = Object.keys(declarations).map((key): FlagWithValueOrOrdinal<F> => {
+            return { ...declarations[key], as: key }
+        })
+    }
 
     for (const declaration of declarationsArray) {
+        builder.define(declaration.as)
         if ('compose' in declaration) {
-            builder.define(declaration.as).compose(...declaration.compose)
-        } else if ('ordinal' in declaration) {
-            builder
-                .define(declaration.as!) // see note above
-                .withOrdinal(declaration.ordinal)
-                .requires(...(declaration.requires ?? []))
+            builder.compose(...declaration.compose)
         } else {
-            builder
-                .define(declaration.as!) // see note above
-                .withValue(declaration.value)
-                .requires(...(declaration.requires ?? []))
+            if ('ordinal' in declaration) {
+                builder.withOrdinal(declaration.ordinal)
+            } else {
+                builder.withValue(declaration.value)
+            }
+
+            if (declaration.requires !== undefined) {
+                builder.requires(...declaration.requires)
+            }
         }
     }
 }
