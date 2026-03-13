@@ -76,11 +76,69 @@ describe(CollectionFlagSet, () => {
         expect(flags.isSuperset(set('C', 'D'), set('B'))).toBe(false)
     })
 
+    test('hasAny', () => {
+        const flags = createCollectionFlagSet([
+            { value: 12, as: 'a' },
+            { value: 45, as: 'b', requires: ['a'] },
+            { value: 78, as: 'c' },
+        ])
+
+        expect(flags.hasAny(set(), set())).toBe(false)
+        expect(flags.hasAny(set(12, 45, 78), set())).toBe(false)
+        expect(flags.hasAny(set(12, 45, 78), set(12))).toBe(true)
+        expect(flags.hasAny(set(12), set(12, 78))).toBe(true)
+        expect(flags.hasAny(set(45, 78), set(45))).toBe(false)
+    })
+
+    test('hasAll', () => {
+        const flags = createCollectionFlagSet([
+            { value: 12, as: 'a' },
+            { value: 45, as: 'b', requires: ['a'] },
+            { value: 78, as: 'c' },
+        ])
+
+        expect(flags.hasAll(set(), set())).toBe(true)
+        expect(flags.hasAll(set(12, 45, 78), set())).toBe(true)
+        expect(flags.hasAll(set(12, 45, 78), set(12))).toBe(true)
+        expect(flags.hasAll(set(12), set(12, 78))).toBe(false)
+        expect(flags.hasAll(set(45, 78), set(45))).toBe(false)
+    })
+
     test('enumerate', () => {
         const flags = createCollectionFlagSet<string>([])
 
         expect([...flags.enumerate(set())]).toEqual([])
         expect([...flags.enumerate(set('A'))]).toEqual(['A'])
         expect([...flags.enumerate(set('A', 'B', 'C'))]).toEqual(['A', 'B', 'C'])
+    })
+
+    test('maximum', () => {
+        const flags = createCollectionFlagSet([
+            { value: 12, as: 'a' },
+            { value: 45, as: 'b', requires: ['a'] },
+            { value: 78, as: 'c', requires: ['b'] },
+        ])
+
+        expect(flags.maximum(set())).toEqual(set())
+        expect(flags.maximum(set(12))).toEqual(set(12))
+        expect(flags.maximum(set(45))).toEqual(set(12, 45))
+        expect(flags.maximum(set(78))).toEqual(set(12, 45, 78))
+        expect(flags.maximum(set(99))).toEqual(set())
+    })
+
+    test('minimum', () => {
+        const flags = createCollectionFlagSet([
+            { value: 12, as: 'a' },
+            { value: 45, as: 'b', requires: ['a'] },
+            { value: 78, as: 'c', requires: ['b'] },
+        ])
+
+        expect(flags.minimum(set())).toEqual(set())
+        expect(flags.minimum(set(12))).toEqual(set(12))
+        expect(flags.minimum(set(45))).toEqual(set())
+        expect(flags.minimum(set(12, 45))).toEqual(set(12, 45))
+        expect(flags.minimum(set(12, 78))).toEqual(set(12))
+        expect(flags.minimum(set(12, 45, 78))).toEqual(set(12, 45, 78))
+        expect(flags.minimum(set(99))).toEqual(set())
     })
 })

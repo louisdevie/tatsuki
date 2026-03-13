@@ -1,5 +1,6 @@
-import { BitFlags, BitFlagSet, createBitFlagSet } from '~'
 import { describe, expect, test } from 'vitest'
+
+import { BitFlags, BitFlagSet, createBitFlagSet } from '~'
 
 describe(BitFlagSet, () => {
     test('none', () => {
